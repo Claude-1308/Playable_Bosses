@@ -1,0 +1,24 @@
+[package]
+name = "boss"
+version = "0.1.0"
+authors = ["claude <supermariomasterbro@gmail.com>"]
+edition = "2018"
+
+[package.metadata.skyline]
+titleid = "01006A800016E000"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
+skyline_smash = { path = "../skyline-smash-master", features = ["weak_l2cvalue"] }
+smash_script = { path = "../smash-script-master" }
+smashline = { path = "../smashline-master" }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
