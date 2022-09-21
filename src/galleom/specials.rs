@@ -104,6 +104,8 @@ pub unsafe fn galleom_lariat_status(item: &mut L2CAgentBase) -> L2CValue {
 pub unsafe fn galleom_man_to_tank_coroutine(item: &mut L2CAgentBase) -> L2CValue {
     let lua_state = item.lua_state_agent;
     let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    let owner = BossModule::get_owner(module_accessor);
+    WorkModule::set_int(owner,*ITEM_GALLEOM_STATUS_KIND_SHOOT_MAIN,FIGHTER_MARIO_INSTANCE_WORK_ID_INT_BOSS_SITUATION);
     MotionModule::change_motion(module_accessor,Hash40::new("man_to_tank"),0.0,1.0,false,0.0,false,false);
     boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_man_to_tank"),0.0);
     return L2CValue::I32(0)
@@ -112,8 +114,113 @@ pub unsafe fn galleom_man_to_tank_coroutine(item: &mut L2CAgentBase) -> L2CValue
 pub unsafe fn galleom_man_to_tank_status(item: &mut L2CAgentBase) -> L2CValue {
     let lua_state = item.lua_state_agent;
     let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    let owner = BossModule::get_owner(module_accessor);
+    if ControlModule::check_button_on(owner,*CONTROL_PAD_BUTTON_ATTACK) {
+        WorkModule::set_int(owner,*ITEM_GALLEOM_STATUS_KIND_RUSH_CHARGE,FIGHTER_MARIO_INSTANCE_WORK_ID_INT_BOSS_SITUATION);
+    }
+    if ControlModule::check_button_on(owner,*CONTROL_PAD_BUTTON_SPECIAL) {
+        WorkModule::set_int(owner,*ITEM_GALLEOM_STATUS_KIND_SHOOT_MAIN,FIGHTER_MARIO_INSTANCE_WORK_ID_INT_BOSS_SITUATION);
+    }
     if MotionModule::is_end(module_accessor) {
-        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_SHOOT_MAIN,false);
+        let status = WorkModule::get_int(owner,FIGHTER_MARIO_INSTANCE_WORK_ID_INT_BOSS_SITUATION);
+        StatusModule::change_status_request(module_accessor,status,false);
+    }
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_shoot_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("shoot"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_shoot"),0.0);
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_shoot_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    if MotionModule::is_end(module_accessor) {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_SHOOT_END,false);
+    }
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_loop_coroutine(item: &mut L2CAgentBase) -> L2CValue { //skip this
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("tank_attack_loop"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_tank_attack_loop"),0.0);
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_loop_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    if MotionModule::is_end(module_accessor) { //timer based
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_RUSH_MAIN,false);
+    }
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_rush_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("tank_attack_rush"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_rush_main"),0.0);
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_rush_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    let table: L2CValue = std::mem::transmute((*item).add(0x6a8));
+    if ((table[0xb395de0deu64].get_f32() - PostureModule::pos_x(module_accessor)) * PostureModule::lr(module_accessor)) < 0.0 {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_RUSH_RETURN,false);
+    }
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_return_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    let table: L2CValue = std::mem::transmute((*item).add(0x6a8));
+    if PostureModule::lr(module_accessor) > 0.0 {
+        table[0xb395de0deu64].assign(&table[0x1e0a9e367fu64]);
+    }
+    else {
+        table[0xb395de0deu64].assign(&table[0x1d3c3f38a5u64]);
+    }
+    PostureModule::reverse_lr(module_accessor);
+    PostureModule::update_rot_y_lr(module_accessor);
+    MotionModule::change_motion(module_accessor,Hash40::new("tank_attack_return"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_rush_return"),0.0);
+    boss_private::sub1_energy_from_param_inherit_all(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_rush_return_movement"));
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_return_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    let table: L2CValue = std::mem::transmute((*item).add(0x6a8));
+    if ((table[0xb395de0deu64].get_f32() - PostureModule::pos_x(module_accessor)) * PostureModule::lr(module_accessor)) < 0.0 {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_START,false);
+    }
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_to_man_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("tank_to_man"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_tank_to_main"),0.0);
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_to_man_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    if MotionModule::is_end(module_accessor) {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_WAIT,false);
     }
     return L2CValue::I32(0)
 }
