@@ -27,26 +27,28 @@ pub unsafe fn galleom_missile_fix(fighter: &mut L2CFighterCommon) {
     }
 }
 
-pub unsafe fn galleom_uppercut_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+pub unsafe fn galleom_lariat_loop_coroutine(item: &mut L2CAgentBase) -> L2CValue {
     let lua_state = item.lua_state_agent;
     let module_accessor = sv_system::battle_object_module_accessor(lua_state);
-    MotionModule::change_motion(module_accessor,Hash40::new("uppercut"),0.0,2.0,false,0.0,false,false);
-    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_double_arm"),0.0);
+    let owner = BossModule::get_owner(module_accessor);
+    WorkModule::set_int(owner,60,FIGHTER_MARIO_INSTANCE_WORK_ID_INT_MOVE_HOLD_TIMER);
+    MotionModule::change_motion(module_accessor,Hash40::new("lariat_loop"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_lariat_loop"),0.0);
+    boss_private::sub1_energy_from_param_inherit_all(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_common_brake"));
     return L2CValue::I32(0)
 }
 
-pub unsafe fn galleom_uppercut_status(item: &mut L2CAgentBase) -> L2CValue {
+pub unsafe fn galleom_lariat_loop_status(item: &mut L2CAgentBase) -> L2CValue {
     let lua_state = item.lua_state_agent;
     let module_accessor = sv_system::battle_object_module_accessor(lua_state);
-    if MotionModule::frame(module_accessor) > 57.0
-    && MotionModule::frame(module_accessor) < 68.0 {
-        MotionModule::set_rate(module_accessor,1.0);
-    }
-    else {
-        MotionModule::set_rate(module_accessor,2.0);
-    }
-    if MotionModule::is_end(module_accessor) {
-        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_WAIT,false);
+    let owner = BossModule::get_owner(module_accessor);
+    if ControlModule::check_button_off(module_accessor,*CONTROL_PAD_BUTTON_SPECIAL) {
+        let lariat_hold_frames = 60.0;
+        let held_frames = WorkModule::get_int(owner,FIGHTER_MARIO_INSTANCE_WORK_ID_INT_MOVE_HOLD_TIMER) as f32;
+        let power_mul = (held_frames/lariat_hold_frames) + 1.0;
+        AttackModule::set_power_mul_status(module_accessor,power_mul);
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_DOUBLE_LARIAT_MAIN,false);
+        return L2CValue::I32(1)
     }
     return L2CValue::I32(0)
 }
