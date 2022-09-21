@@ -247,7 +247,7 @@ pub unsafe fn galleom_tank_to_man_coroutine(item: &mut L2CAgentBase) -> L2CValue
     let lua_state = item.lua_state_agent;
     let module_accessor = sv_system::battle_object_module_accessor(lua_state);
     MotionModule::change_motion(module_accessor,Hash40::new("tank_to_man"),0.0,1.0,false,0.0,false,false);
-    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_tank_to_main"),0.0);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_tank_to_man"),0.0);
     return L2CValue::I32(0)
 }
 
@@ -275,4 +275,46 @@ pub unsafe fn install_specials(item: &mut L2CAgentBase) {
     item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_DOUBLE_LARIAT_MAIN),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_lariat_coroutine_func);
     let galleom_lariat_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_lariat_status as *const () as _).get_ptr());
     item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_DOUBLE_LARIAT_MAIN),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_lariat_status_func);
+    
+    let galleom_man_to_tank_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_man_to_tank_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_SHOOT_START),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_man_to_tank_coroutine_func);
+    let galleom_man_to_tank_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_man_to_tank_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_SHOOT_START),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_man_to_tank_status_func);
+    
+    let galleom_shoot_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_shoot_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_SHOOT),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_shoot_coroutine_func);
+    let galleom_shoot_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_shoot_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_SHOOT),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_shoot_status_func);
+    
+    let galleom_tank_attack_loop_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_loop_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_CHARGE),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_attack_loop_coroutine_func);
+    let galleom_tank_attack_loop_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_loop_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_CHARGE),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_attack_loop_status_func);
+    
+    let galleom_tank_attack_rush_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_rush_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_MAIN),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_attack_rush_coroutine_func);
+    let galleom_tank_attack_rush_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_rush_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_MAIN),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_attack_rush_status_func);
+    
+    let galleom_tank_attack_return_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_return_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_RETURN),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_attack_return_coroutine_func);
+    let galleom_tank_attack_return_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_return_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_RETURN),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_attack_return_status_func);
+    
+    let galleom_tank_attack_finish_start_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_finish_start_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_START),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_attack_finish_start_coroutine_func);
+    let galleom_tank_attack_finish_start_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_finish_start_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_START),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_attack_finish_start_status_func);
+    
+    let galleom_tank_attack_finish_end_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_finish_end_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_END),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_attack_finish_end_coroutine_func);
+    let galleom_tank_attack_finish_end_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_attack_finish_end_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_END),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_attack_finish_end_status_func);
+    
+    let galleom_tank_to_man_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_to_man_coroutine as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_SHOOT_END),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_to_man_coroutine_func);
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_RETURN_TRANSFORM),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_tank_to_man_coroutine_func);
+    let galleom_tank_to_man_status_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_tank_to_man_status as *const () as _).get_ptr());
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_SHOOT_END),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_to_man_status_func);
+    item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_RUSH_RETURN_TRANSFORM),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS),galleom_tank_to_man_status_func);
 }
