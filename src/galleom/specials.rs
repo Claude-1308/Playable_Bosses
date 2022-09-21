@@ -208,6 +208,41 @@ pub unsafe fn galleom_tank_attack_return_status(item: &mut L2CAgentBase) -> L2CV
     return L2CValue::I32(0)
 }
 
+pub unsafe fn galleom_tank_attack_finish_start_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("tank_attack_finish_start"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_rush_finish_start"),0.0);
+    boss_private::sub1_energy_from_param_inherit_all(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_rush_finish_start_brake"));
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_finish_start_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    if MotionModule::is_end(module_accessor) {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_END,false);
+    }
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_finish_end_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("tank_attack_finish_end"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_rush_finish_end"),0.0);
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_tank_attack_finish_end_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    if MotionModule::is_end(module_accessor) {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_RUSH_RETURN_TRANSFORM,false);
+    }
+    return L2CValue::I32(0)
+}
+
 pub unsafe fn galleom_tank_to_man_coroutine(item: &mut L2CAgentBase) -> L2CValue {
     let lua_state = item.lua_state_agent;
     let module_accessor = sv_system::battle_object_module_accessor(lua_state);
