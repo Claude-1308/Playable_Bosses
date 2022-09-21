@@ -101,6 +101,23 @@ pub unsafe fn galleom_lariat_status(item: &mut L2CAgentBase) -> L2CValue {
     return L2CValue::I32(0)
 }
 
+pub unsafe fn galleom_man_to_tank_coroutine(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    MotionModule::change_motion(module_accessor,Hash40::new("man_to_tank"),0.0,1.0,false,0.0,false,false);
+    boss_private::main_energy_from_param(lua_state,ItemKind(*ITEM_KIND_GALLEOM),Hash40::new("energy_param_man_to_tank"),0.0);
+    return L2CValue::I32(0)
+}
+
+pub unsafe fn galleom_man_to_tank_status(item: &mut L2CAgentBase) -> L2CValue {
+    let lua_state = item.lua_state_agent;
+    let module_accessor = sv_system::battle_object_module_accessor(lua_state);
+    if MotionModule::is_end(module_accessor) {
+        StatusModule::change_status_request(module_accessor,*ITEM_GALLEOM_STATUS_KIND_SHOOT_MAIN,false);
+    }
+    return L2CValue::I32(0)
+}
+
 pub unsafe fn install_specials(item: &mut L2CAgentBase) {
     let galleom_jump_land_coroutine_func: &mut skyline::libc::c_void = std::mem::transmute(L2CValue::Ptr(galleom_jump_land_coroutine as *const () as _).get_ptr());
     item.sv_set_status_func(L2CValue::I32(*ITEM_GALLEOM_STATUS_KIND_LARGE_JUMP_LANDING),L2CValue::I32(*ITEM_LUA_SCRIPT_STATUS_FUNC_STATUS_COROUTINE),galleom_jump_land_coroutine_func);
