@@ -1,0 +1,31 @@
+void FUN_7100426900(long param_1)
+
+{
+  bool bVar1;
+  byte bVar2;
+  int iVar3;
+  L2CValue *pLVar4;
+  L2CValue *in_x8;
+  L2CValue aLStack96 [16];
+  L2CValue aLStack80 [16];
+  L2CValue aLStack64 [16];
+  
+  pLVar4 = (L2CValue *)lib::L2CValue::operator[]((L2CValue *)(param_1 + 0x6a8),0xb395de0de);
+  lib::L2CValue::L2CValue(aLStack80,pLVar4);
+  FUN_710042b200(aLStack64,param_1,aLStack80);
+  bVar1 = lib::L2CValue::operator.cast.to.bool(aLStack64);
+  lib::L2CValue::~L2CValue(aLStack64);
+  lib::L2CValue::~L2CValue(aLStack80);
+  if ((bVar1 & 1U) != 0) {
+    lib::L2CValue::L2CValue(aLStack96,_ITEM_GALLEOM_STATUS_KIND_RUSH_FINISH_START);
+    lib::L2CValue::operator==(aLStack96,(L2CValue *)&LUA_SCRIPT_LINE_SYSTEM_POST);
+    iVar3 = lib::L2CValue::as_integer(aLStack96);
+    bVar2 = app::lua_bind::StatusModule__change_status_request_impl
+                      (*(BattleObjectModuleAccessor **)(param_1 + 0x40),iVar3,false);
+    lib::L2CValue::L2CValue(aLStack64,(bool)(bVar2 & 1));
+    lib::L2CValue::~L2CValue(aLStack64);
+    lib::L2CValue::~L2CValue(aLStack96);
+  }
+  lib::L2CValue::L2CValue(in_x8,0);
+  return;
+}

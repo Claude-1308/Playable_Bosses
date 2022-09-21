@@ -1,0 +1,32 @@
+void turn(long param_1)
+
+{
+  byte bVar1;
+  int iVar2;
+  L2CValue *in_x8;
+  L2CValue aLStack112 [16];
+  L2CValue aLStack96 [16];
+  L2CValue aLStack80 [16];
+  L2CValue aLStack64 [16];
+  L2CValue aLStack48 [16];
+  
+  lib::L2CValue::L2CValue(aLStack64,0x420201547);
+  FUN_71008a0370(param_1,aLStack64);
+  lib::L2CValue::~L2CValue(aLStack64);
+  lib::L2CValue::L2CValue(aLStack80,0x117d52bc14);
+  lib::L2CValue::L2CValue(aLStack96,0x17ec4748a5);
+  FUN_71008e0b80(param_1,aLStack80,aLStack96);
+  lib::L2CValue::~L2CValue(aLStack96);
+  lib::L2CValue::~L2CValue(aLStack80);
+  FUN_71008d7900(param_1);
+  lib::L2CValue::L2CValue(aLStack112,_ITEM_STATUS_KIND_TRANS_PHASE);
+  lib::L2CValue::operator==(aLStack112,(L2CValue *)&LUA_SCRIPT_LINE_SYSTEM_POST);
+  iVar2 = lib::L2CValue::as_integer(aLStack112);
+  bVar1 = app::lua_bind::StatusModule__change_status_request_impl
+                    (*(BattleObjectModuleAccessor **)(param_1 + 0x40),iVar2,false);
+  lib::L2CValue::L2CValue(aLStack48,(bool)(bVar1 & 1));
+  lib::L2CValue::~L2CValue(aLStack48);
+  lib::L2CValue::~L2CValue(aLStack112);
+  lib::L2CValue::L2CValue(in_x8,0);
+  return;
+}
